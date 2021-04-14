@@ -5,6 +5,7 @@
  */
 package com.mycompany.weatherdatadisplay.presenter;
 
+import com.mycompany.weatherdatadisplay.model.AtulizadorMediaObserver;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -22,7 +23,9 @@ import org.json.XML;
 public class TempoPresenter {
 
     private final TelaInicial iTela;
-    private TempoModel media;
+    private AtulizadorMediaObserver mediaDiaria;
+    private AtulizadorMediaObserver mediaSemanal;
+    private AtulizadorMediaObserver mediaMensal;
     private final Dados dados;
     
     private int countRegistros = 0;
@@ -31,6 +34,9 @@ public class TempoPresenter {
         this.iTela = new TelaInicial(this);
         this.iTela.setVisible(true);
         this.dados = new Dados();
+        this.mediaDiaria = new AtulizadorMediaObserver();
+        this.mediaSemanal = new AtulizadorMediaObserver();
+        this.mediaMensal = new AtulizadorMediaObserver();
     }
     
     public void incluirDados (LocalDate data, Double temperatura, Double umidade, Double pressao){
@@ -43,7 +49,7 @@ public class TempoPresenter {
         this.dados.getDados().remove(linha);
     }
     
-    public TempoModel calculaMedia(int opcao){
+    public void calculaMedia(int opcao){
         
         LocalDate dataHoje = LocalDate.now();
         Double tempCount = 0.0;
@@ -53,7 +59,7 @@ public class TempoPresenter {
         Double mediaUmidade = 0.0;
         Double mediaPressao = 0.0;
         this.countRegistros = 0;
-        this.media = new TempoModel(dataHoje,tempCount, pressaoCount,umidadeCount);
+
         
         int i = 0;
         int tamanho = this.dados.getDados().size();
@@ -68,6 +74,11 @@ public class TempoPresenter {
                     pressaoCount += this.dados.getDados().get(i).getPressao();
                 }
             }
+                mediaTemperatura =  (tempCount / countRegistros);
+                mediaUmidade = (umidadeCount/countRegistros);
+                mediaPressao = (pressaoCount/countRegistros);
+
+                mediaDiaria.update(new TempoModel(LocalDate.now(), mediaTemperatura, mediaUmidade, mediaPressao));
         }
         
         //calculo de media semanal = 7 dias anteriores
@@ -82,6 +93,11 @@ public class TempoPresenter {
                     pressaoCount += this.dados.getDados().get(i).getPressao();
                 }
             }
+                mediaTemperatura =  (tempCount / countRegistros);
+                mediaUmidade = (umidadeCount/countRegistros);
+                mediaPressao = (pressaoCount/countRegistros);
+
+                mediaSemanal.update(new TempoModel(LocalDate.now(), mediaTemperatura, mediaUmidade, mediaPressao));
         }
         
         //calculo de media mensal = 31 dias anteriores
@@ -96,19 +112,16 @@ public class TempoPresenter {
                     pressaoCount += this.dados.getDados().get(i).getPressao();
                 }
             }
+                mediaTemperatura =  (tempCount / countRegistros);
+                mediaUmidade = (umidadeCount/countRegistros);
+                mediaPressao = (pressaoCount/countRegistros);
+
+                mediaMensal.update(new TempoModel(LocalDate.now(), mediaTemperatura, mediaUmidade, mediaPressao));
         }
+    
         
-        mediaTemperatura =  (tempCount / countRegistros);
-        mediaUmidade = (umidadeCount/countRegistros);
-        mediaPressao = (pressaoCount/countRegistros);
-        
-        media.setPressao(mediaPressao);
-        media.setTemperatura(mediaTemperatura);
-        media.setUmidade(mediaUmidade);
-        
-        
-        return media;
     }
+    
     
     public void insertLog (TempoModel tempo){
         JSONObject jsonObject = new JSONObject();
@@ -172,5 +185,19 @@ public class TempoPresenter {
     public int getCountRegistros() {
         return countRegistros;
     }
+
+    public AtulizadorMediaObserver getMediaDiaria() {
+        return mediaDiaria;
+    }
+
+    public AtulizadorMediaObserver getMediaSemanal() {
+        return mediaSemanal;
+    }
+
+    public AtulizadorMediaObserver getMediaMensal() {
+        return mediaMensal;
+    }
+    
+    
     
 }

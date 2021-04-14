@@ -64,7 +64,6 @@ public class TelaInicial extends javax.swing.JFrame {
         umidadeMedia = new javax.swing.JLabel();
         pressaoMedia = new javax.swing.JLabel();
         numeroDeRegistrosPeriodo = new javax.swing.JLabel();
-        gerarDadosMedios = new javax.swing.JButton();
         selecionadorPeriodo = new javax.swing.JComboBox<>();
         configuracaoSistema = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
@@ -267,13 +266,6 @@ public class TelaInicial extends javax.swing.JFrame {
 
         numeroDeRegistrosPeriodo.setText("Sem dados");
 
-        gerarDadosMedios.setText("Gerar");
-        gerarDadosMedios.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                gerarDadosMediosActionPerformed(evt);
-            }
-        });
-
         selecionadorPeriodo.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Diária", "Semanal", "Mensal" }));
         selecionadorPeriodo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -311,10 +303,6 @@ public class TelaInicial extends javax.swing.JFrame {
                             .addGap(18, 18, 18)
                             .addComponent(temperaturaMedia))))
                 .addContainerGap(70, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, dadosMediosLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(gerarDadosMedios, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
         );
         dadosMediosLayout.setVerticalGroup(
             dadosMediosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -342,9 +330,7 @@ public class TelaInicial extends javax.swing.JFrame {
                     .addGroup(dadosMediosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(numeroDeRegistrosPeriodo)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(gerarDadosMedios)
-                .addGap(0, 0, Short.MAX_VALUE))
+                .addGap(0, 24, Short.MAX_VALUE))
         );
 
         configuracaoSistema.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -393,11 +379,11 @@ public class TelaInicial extends javax.swing.JFrame {
                 .addGroup(configuracaoSistemaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(configuracaoSistemaLayout.createSequentialGroup()
                         .addComponent(jLabel18)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, configuracaoSistemaLayout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(salvarConfig)
-                        .addContainerGap())))
+                        .addComponent(salvarConfig)))
+                .addContainerGap())
             .addGroup(configuracaoSistemaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(configuracaoSistemaLayout.createSequentialGroup()
                     .addGap(43, 43, 43)
@@ -589,10 +575,10 @@ public class TelaInicial extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(title, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(dadosTempo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(dadosMedios, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(configuracaoSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(dadosTempo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(configuracaoSistema, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dadosMedios, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -638,25 +624,39 @@ public class TelaInicial extends javax.swing.JFrame {
         pressaoDadosTempo.setText("");
         temperaturaDadosTempo.setText("");
         
-        int total = Integer.parseInt(totalDeRegistros.getText());
-        total++;
-        totalDeRegistros.setText(Integer.toString(total));
+ 
+        atualizaTotalRegistros();
+        atualizaMedia();
     }//GEN-LAST:event_incluirDadosActionPerformed
 
+    private void atualizaMedia(){
+        var opcao = this.selecionadorPeriodo.getSelectedIndex();
+        this.tempoPresenter.calculaMedia(opcao);
+        
+        if (opcao == 0){
+            this.temperaturaMedia.setText(this.tempoPresenter.getMediaDiaria().getMediaTemperatura().toString());
+            this.pressaoMedia.setText(this.tempoPresenter.getMediaDiaria().getMediaPressao().toString());
+            this.umidadeMedia.setText(this.tempoPresenter.getMediaDiaria().getMediaUmidade().toString());
+            this.numeroDeRegistrosPeriodo.setText(String.valueOf(this.tempoPresenter.getCountRegistros()));
+        }
+        
+        if (opcao == 1){
+            this.temperaturaMedia.setText(this.tempoPresenter.getMediaSemanal().getMediaTemperatura().toString());
+            this.pressaoMedia.setText(this.tempoPresenter.getMediaSemanal().getMediaPressao().toString());
+            this.umidadeMedia.setText(this.tempoPresenter.getMediaSemanal().getMediaUmidade().toString());
+            this.numeroDeRegistrosPeriodo.setText(String.valueOf(this.tempoPresenter.getCountRegistros()));
+        }
+        
+        if (opcao == 2){
+            this.temperaturaMedia.setText(this.tempoPresenter.getMediaMensal().getMediaTemperatura().toString());
+            this.pressaoMedia.setText(this.tempoPresenter.getMediaMensal().getMediaPressao().toString());
+            this.umidadeMedia.setText(this.tempoPresenter.getMediaMensal().getMediaUmidade().toString());
+            this.numeroDeRegistrosPeriodo.setText(String.valueOf(this.tempoPresenter.getCountRegistros()));
+        }
+    }
     private void umidadeDadosTempoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_umidadeDadosTempoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_umidadeDadosTempoActionPerformed
-
-    private void gerarDadosMediosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_gerarDadosMediosActionPerformed
-        
-        var opcao = this.selecionadorPeriodo.getSelectedIndex();
-        var media = this.tempoPresenter.calculaMedia(opcao);
-        
-        this.temperaturaMedia.setText(media.getTemperatura().toString());
-        this.pressaoMedia.setText(media.getPressao().toString());
-        this.umidadeMedia.setText(media.getUmidade().toString());
-        this.numeroDeRegistrosPeriodo.setText(String.valueOf(this.tempoPresenter.getCountRegistros()));
-    }//GEN-LAST:event_gerarDadosMediosActionPerformed
 
     private void removerBotaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removerBotaoActionPerformed
         
@@ -666,18 +666,20 @@ public class TelaInicial extends javax.swing.JFrame {
         this.tempoPresenter.deleteLog(row);
         this.tempoPresenter.deletarDados(row);
         model.removeRow(registroTabela.getSelectedRow());
+        atualizaMedia();
         
-        int total = Integer.parseInt(totalDeRegistros.getText());
-        total--;
-        totalDeRegistros.setText(Integer.toString(total));
+        atualizaTotalRegistros();
     }//GEN-LAST:event_removerBotaoActionPerformed
-
+    
+    private void atualizaTotalRegistros(){
+        totalDeRegistros.setText(Integer.toString(this.tempoPresenter.getDados().getDados().size()));
+    }
     private void dataDadosTempoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dataDadosTempoActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_dataDadosTempoActionPerformed
 
     private void selecionadorPeriodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selecionadorPeriodoActionPerformed
-        // TODO add your handling code here:
+        atualizaMedia();
     }//GEN-LAST:event_selecionadorPeriodoActionPerformed
 
     private void salvarConfigActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_salvarConfigActionPerformed
@@ -725,7 +727,6 @@ public class TelaInicial extends javax.swing.JFrame {
     private javax.swing.JPanel dadosMedios;
     private javax.swing.JPanel dadosTempo;
     private javax.swing.JFormattedTextField dataDadosTempo;
-    private javax.swing.JButton gerarDadosMedios;
     private javax.swing.JButton incluirDados;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;

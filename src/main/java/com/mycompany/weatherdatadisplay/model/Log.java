@@ -9,7 +9,7 @@ import org.json.simple.JSONArray;
 
 /**
  *
- * @author Davidson
+ * @author Lucas Marques Fonseca
  */
 public abstract class Log {
     private static JSONArray jsonArray = new JSONArray();
